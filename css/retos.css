@@ -1,0 +1,30 @@
+/* proviene de equipos.html */
+.form-container {
+    max-width: 500px;
+    margin: auto;
+}
+
+/* Proviene de  registro.html */
+.selec-fac {
+    width: 100%; 
+    padding: 10px; 
+    border: 1px solid #d4d3d3; 
+    border-radius: 3px;
+}
+
+/* Proviene de SeleccionaRetos.php */
+.form-container {
+    max-width: 500px;
+    margin: auto;
+}
+.hidden {
+    display: none;
+}
+
+.reto-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+.form-check {
+    margin-bottom: 1rem;
+}

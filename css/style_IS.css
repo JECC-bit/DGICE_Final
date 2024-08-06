@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #edeaea;
+    font-family: "Poppins", sans-serif;
+}
+
+header {
+    background-color: #CCDB94;
+    color: #fff;
+    padding: 10px 0;
+}
+
+.navbar{
+    background-color: #CCDB94;
+    font-wght: 600;
+    font-size: 18px;
+}
+
+.navbar img{
+    width: 60px;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 10px;
+    padding: 10px ;
+ 
+}
+
+nav ul li {
+    display:inline; 
+    margin-right: 20px;
+}
+
+nav ul li a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.login-container {
+    max-width: 400px;
+    margin: 50px auto;
+    margin-top: 10%;
+    background-color: #fff;
+    padding: 50px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(108, 3, 3, 0.1);
+}
+
+.registro-container {
+    max-width: 600px;
+    margin: 50px auto;
+    margin-top: 8%;
+    background-color: #fff;
+    padding: 50px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(108, 3, 3, 0.1);
+}
+
+h2 {
+    margin-bottom: 20px;
+    padding: 0;
+    color: #000000;
+    text-align: center;
+}
+
+.input-group {
+    margin-bottom: 10px;
+    
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d4d3d3;
+    border-radius: 3px;
+}
+
+.obligatorio {
+    color: red;
+}
+
+.button-group {
+    text-align: center;
+}
+
+button {
+    padding: 15px 15px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    margin-left: 150px;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+.cuenta {
+    text-align: center;
+}
+
+.additional-actions {
+    margin-top: 20px;
+}
+
+.additional-actions p {
+    margin-bottom: 10px;
+}
+
+.additional-actions a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+
+@media (max-width: 767px){
+    .registro-container{
+        margin-top: 90px;
+    }
+    .login-container{
+        margin-top: 90px;
+    }
+}

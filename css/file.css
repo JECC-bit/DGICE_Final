@@ -1,0 +1,71 @@
+.drop-area{
+    border: 3px dashed #ccc;
+    height: 250px;
+    width: 100%;
+    border-radius: 5px;
+    display: flex;
+    alaign-items: center;
+    justify-content: center;
+}
+
+.drop-area.active{
+    border-color: #b8d4fe;
+    background-color: #F5F8EA;
+    color: black;
+    border: 2px dashed #618ac9;
+}
+
+.drop-area label{
+    padding: 10px 25px;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    background-color:  #CCDB94;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.file-container{
+    display: flex;
+    alaign-items: center;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+#preview{
+    margin-top: 10px;
+}
+
+#preview .bi{
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.status-text{
+    padding: 0 10px;
+}
+
+.success{
+    color: green;
+}
+
+.failure{
+    color: red;
+}
+
+#contenidoInputFiles{
+    margin-top: 5%;
+}
+
+#contenidoInputFiles i{
+    font-size: 40px;
+}
+
+@media (max-width: 767px){
+    .drop-area{
+        width: 100%;
+    }
+
+}

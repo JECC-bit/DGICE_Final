@@ -1,0 +1,117 @@
+body {
+    font-family: "Poppins", sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    padding-top:10px; /* Espacio para la barra de navegación fija */
+}
+
+h2 {
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center; 
+}
+
+.table-responsive {
+    margin: 20px 0;
+    margin-left: 60px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+}
+
+.table th,
+.table td {
+    padding: 12px 15px;
+    text-align: left;
+    border: 1px solid #dee2e6;
+}
+
+.table th {
+    background-color: #f1f1f1;
+}
+
+thead th {
+    background-color: #007bff;
+    color: white;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+#total-participantes {
+    font-weight: 600;
+    text-align: center; 
+}
+
+.select-container {
+    display: flex;
+    justify-content: center; /* Centra el contenedor del menú desplegable */
+    align-items: center;
+    margin-top: 20px;
+}
+
+select.form-select {
+    padding: 10px 15px; /* tamaño del recuadro cochino */
+    font-size: 16px; 
+    width: auto; 
+    border-radius: 5px; 
+    border: 1px solid #ced4da; /* Añade un borde */
+    margin-left: 10px;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: flex-end; /* Alínea el contenedor del botón a la derecha */
+    align-items: center;
+    margin-top: 0;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.container-fluid {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+/* #####
+#barraLateralRetraible {
+    height: 100%;
+    position: fixed;
+    width: 20%;
+    background-color: #f8f9fa;
+    border-right: 1px solid #e9ecef;
+    padding: 1%;
+    margin-right: 10px;
+}
+
+#barraLateralRetraible a{
+    text-decoration: none;
+    color: black;
+
+}
+
+#barraLateralRetraible li{
+    list-style: none;
+    padding: 5%;
+    border-bottom: 1px solid #e9ecef;
+}
+
+#barraLateralRetraible li active{
+    background-color: #f5f5f5;
+    
+} */
