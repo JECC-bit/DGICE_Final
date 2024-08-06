@@ -1,0 +1,100 @@
+<?php
+    include 'scripts/db.php';
+
+    $codigoBootcamp = $_GET['cod'];
+
+    // Obtener el ID del bootcamp usando el código
+    $sqlBootcampId = "SELECT Id_bootcamp, Nombre_bootcamp FROM bootcamp WHERE Codigo = ?";
+    $stmtBootcampId = $conn->prepare($sqlBootcampId);
+    $stmtBootcampId->bind_param("s", $codigoBootcamp);
+    $stmtBootcampId->execute();
+    $resultBootcampId = $stmtBootcampId->get_result();
+    $rowBootcampId = $resultBootcampId->fetch_assoc();
+    $idBootcamp = $rowBootcampId['Id_bootcamp'];
+
+    // Obtener las actividades del bootcamp en orden
+    $sqlActivities = "
+        SELECT a.Id_actividad, a.Titulo, a.Status, a.orden 
+        FROM actividad a
+        JOIN asignacion_actividad aa ON a.Id_actividad = aa.Id_actividad
+        WHERE aa.Id_bootcamp = ?
+        ORDER BY a.orden
+    ";
+    $stmtActivities = $conn->prepare($sqlActivities);
+    $stmtActivities->bind_param("i", $idBootcamp);
+    $stmtActivities->execute();
+    $resultActivities = $stmtActivities->get_result();
+
+    $stmtBootcampId->close();
+    $stmtActivities->close();
+    $conn->close();
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividades</title>
+    <link rel="icon" href="img/UDC_logo.ico" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/actividades.css">
+
+</head>
+<body>
+<!-- ! Barra de navegación -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+            <div class="container">
+                <a href="Principal.html" class="navbar-brand"><img src="img/logo.png" alt="Logo"></a>
+                <a class="nav-link" href="Principal.php?sesion=cerrar"><span class="btn btn-outline-secondary"></spa>Cerrar Sesión</a>
+            </div>
+        </nav>
+    </header>
+<!-- ! Contenido -->
+    <main class="mt-5">
+        <section class="content text-center mt-0 mt-md-5 mt-lg-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <div class="mb-3">
+                            <img src="img/UDC.png" alt="">
+                        </div>
+                        <div class="mb-3">
+                            <h2 class="mb-3"><?php echo $rowBootcampId['Nombre_bootcamp'] ?></h2>
+                            <h3 class="mb-3">Actividades</h3><br>
+                        </div>
+                        <div class="col-12 offset-md-5 content-list">
+                            <div id="actividades-lista">
+                                <ol>
+                                    <?php while ($rowActivity = $resultActivities->fetch_assoc()): ?>
+                                        <li class="<?php echo strtolower($rowActivity['Status']); ?>">
+                                            <a href="<?php echo ($rowActivity['Status'] == 'pending' || $rowActivity['Status'] == 'completed') ? 'actividad.php?cod='.$_GET['cod'].'&id=' . $rowActivity['Id_actividad'] : '#'; ?>">
+                                                <i class="<?php echo ($rowActivity['Status'] == 'completed') ? 'fas fa-check-circle' : (($rowActivity['Status'] == 'pending') ? 'far fa-clock' : 'fas fa-lock'); ?>"></i>
+                                                <?php echo $rowActivity['orden'] . ".- " . $rowActivity['Titulo']; ?>
+                                            </a>
+                                        </li>
+                                    <?php endwhile; ?>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="bg-dark p-2 text-center" id="actividades-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <p class="text-white">&copy; Derechos Reservados 2022 - 2025 Universidad de Colima</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
