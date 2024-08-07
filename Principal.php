@@ -8,12 +8,23 @@
     }
 
     // Función para verificar si el usuario está registrado en algún bootcamp
-    function estaRegistradoEnBootcamp($pdo, $id_cuenta) {
-        $stmt = $pdo->prepare('SELECT b.Codigo FROM asignacion_cuenta ac 
-                            JOIN bootcamp b ON ac.Id_bootcamp = b.Id_bootcamp 
-                            WHERE ac.Id_cuenta = ?');
-        $stmt->execute([$id_cuenta]);
-        return $stmt->fetchColumn(); // Retorna el código del bootcamp si está registrado, o false si no lo está
+    function estaRegistradoEnBootcamp($pdo, $id_cuenta, $rol) {
+        if ($rol === 'Administrador') {
+            // Si es un administrador, no necesita estar registrado en un bootcamp
+            $stmt = $pdo->prepare('SELECT b.Codigo FROM asignacion_encargado ae
+                                JOIN bootcamp b ON ae.Id_bootcamp = b.Id_bootcamp 
+                                WHERE ae.Id_cuenta = ?');
+            $stmt->execute([$id_cuenta]);
+            return $stmt->fetchColumn(); // Retorna el código del bootcamp si está registrado, o false si no lo está
+        }
+        else if ($rol === 'Usuario') {
+            // Si es un estudiante, verificar si está registrado en algún bootcamp
+            $stmt = $pdo->prepare('SELECT b.Codigo FROM asignacion_cuenta ac 
+                                JOIN bootcamp b ON ac.Id_bootcamp = b.Id_bootcamp 
+                                WHERE ac.Id_cuenta = ?');
+            $stmt->execute([$id_cuenta]);
+            return $stmt->fetchColumn(); // Retorna el código del bootcamp si está registrado, o false si no lo está
+        }
     }
 
     // Verifica si existe el parámetro 'sesion' en la URL y si su valor es 'cerrar'
@@ -37,10 +48,18 @@
     }
 
     // Verificar si el usuario está registrado en algún bootcamp
-    $codigo_bootcamp = estaRegistradoEnBootcamp($pdo, $_SESSION['id_cuenta']);
+    $codigo_bootcamp = estaRegistradoEnBootcamp($pdo, $_SESSION['id_cuenta'], $_SESSION['rol']);
     if ($codigo_bootcamp) {
-        // Si está registrado en un bootcamp, redirigir a actividades.php con el código del bootcamp
-        header("Location: actividades.php?cod=" . $codigo_bootcamp);
+        if ($_SESSION['rol'] == 'Administrador') {
+            // Si es un administrador, redirigir a actividades.php con el código del bootcamp
+            header("Location: actividades_admin.php?cod=" . $codigo_bootcamp);
+            exit();
+        }
+        elseif ($_SESSION['rol'] == 'Usuario') {
+            // Si es un estudiante, redirigir a actividades.php con el código del bootcamp
+            header("Location: actividades.php?cod=" . $codigo_bootcamp);
+            exit();
+        }
         exit();
     }
 

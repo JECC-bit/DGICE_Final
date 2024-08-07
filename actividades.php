@@ -1,3 +1,20 @@
+<?php 
+
+    // Verifica si existe el parámetro 'sesion' en la URL y si su valor es 'cerrar'
+    if (isset($_GET['cerrar']) && $_GET['cerrar'] === 'yes') {
+        // Destruye la sesión
+        session_destroy();
+        
+        // Limpia la variable de sesión
+        $_SESSION = array();
+        
+        // Redirige al usuario a la página de inicio o login
+        header("Location: InicioSesion.php");
+        exit();
+    }
+
+?>
+
 <?php
     include 'scripts/db.php';
 
@@ -43,21 +60,50 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/actividades.css">
+    <link rel="stylesheet" href="css/crearBootcampCSS.css">
 
 </head>
 <body>
 <!-- ! Barra de navegación -->
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <nav class="navbar navbar-light bg-light fixed-top">
             <div class="container">
-                <a href="Principal.html" class="navbar-brand"><img src="img/logo.png" alt="Logo"></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#barraLateralRetraible" aria-controls="barraLateralRetraible" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <a href="Principal.php" class="navbar-brand"><img src="img/logo.png" alt="Logo"></a>
                 <a class="nav-link" href="Principal.php?sesion=cerrar"><span class="btn btn-outline-secondary"></spa>Cerrar Sesión</a>
             </div>
         </nav>
+        <!--? Contenido barra lateral retraible -->
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="barraLateralRetraible" aria-labelledby="barraLateralLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="barraLateralLabel">Acciones</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                    <li class="nav-item active mb-2 shadow rounded">
+                        <!--! Cambiar el active en la clase para indicar en la acción en la que está actualmente -->
+                        <!--! El aria-current es para indicar que se encuentra en la página actual, también cambiarla según sea el caso -->
+                        <?php echo '<a class="nav-link active mb-2 ms-4 mt-2" aria-current="page" href="actividades.php?cod='.$_GET['cod'].'">';?>
+                            <i class="bi bi-bookmark-check me-2"></i>
+                            <span>Actividades asignadas</span>
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <?php echo '<a class="nav-link mb-2 ms-2 mt-2" href="#">';?>
+                            <i class="bi bi-people-fill me-2"></i>
+                            <span>Mi equipo</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </header>
 <!-- ! Contenido -->
-    <main class="mt-5">
-        <section class="content text-center mt-0 mt-md-5 mt-lg-5">
+    <main class="mt-5" >
+        <section class="content text-center mt-0 mt-md-2 mt-lg-2">
             <div class="container">
                 <div class="row">
                     <div class="col-md-12 text-center">

@@ -21,7 +21,7 @@
     $codigoBootcamp = $_GET['cod'];
 
     // Obtener el ID del bootcamp usando el código
-    $sqlBootcampId = "SELECT Id_bootcamp FROM bootcamp WHERE Codigo = ?";
+    $sqlBootcampId = "SELECT Id_bootcamp, Nombre_bootcamp FROM bootcamp WHERE Codigo = ?";
     $stmtBootcampId = $conn->prepare($sqlBootcampId);
     $stmtBootcampId->bind_param("s", $codigoBootcamp);
     $stmtBootcampId->execute();
@@ -71,7 +71,7 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#barraLateralRetraible" aria-controls="barraLateralRetraible" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <a href="Principal.php" class="navbar-brand"><img src="img/logo.png" alt="Logo"></a>
+            <a href="bootcamps_index.php" class="navbar-brand"><img src="img/logo.png" alt="Logo"></a>
             <a class="nav-link" href="#"><span class="bi bi-person-circle" title="Perfil"></span></a>
         </div>
     </nav>
@@ -179,7 +179,8 @@
                                     <img src="img/UDC.png" alt="">
                                 </div>
                                 <div class="mb-3">
-                                    <h2 class="mb-3">Nombre del bootcamp</h2>
+                                    <?php echo '<h2 class="mb-3">'.$rowBootcampId['Nombre_bootcamp'].'</h2>'; ?>
+                                    <!-- <h2 class="mb-3">Nombre del bootcamp</h2> -->
                                     <h3 class="mb-3">Actividades</h3><br>
                                 </div>
                                 <div class="col-12 mb-5" id="activity-button">

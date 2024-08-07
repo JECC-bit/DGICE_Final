@@ -4,6 +4,14 @@
     margin-right: 10%; /* Ajusta el margen derecho según tu preferencia */
 }
 
+navbar{
+    display: flex;
+}
+
+.navbar-brand{
+    margin-left: 9%;
+}
+
 .content{
     margin-bottom: 0%;
 }
@@ -97,10 +105,10 @@ a {
 .upload-button:hover {
     background-color: #0056b3;
 }
-#file-preview {
+.file-preview {
     margin-top: 10px;
     max-width: 100%;
-    height: auto;
+    height: 100%;
 }
 .submit-button{
     border: 1px solid white ;
