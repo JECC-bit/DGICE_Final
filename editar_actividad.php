@@ -2,6 +2,13 @@
 <?php
 include 'scripts/db.php';
 
+// Nos aseguramos que solo los administradores puedan acceder a esta página
+session_start();
+if ($_SESSION['rol'] !== 'Administrador') {
+    header("Location: home_bootcamp.html");
+    exit();
+}
+
 $codigoBootcamp = $_GET['cod']; // Obtener el código del bootcamp desde la URL
 
 // Obtener el Id_bootcamp a partir del código
@@ -37,11 +44,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $titulo = $_POST['nombre'];
     $descripcion = $_POST['descripcion'];
     $fechaEntrega = $_POST['fechaEntrega'] . ' ' . $_POST['horaEntrega'];
+    $orden = $_POST['orden'];
 
     // Actualizar la actividad en la base de datos
-    $sqlUpdateActivity = "UPDATE actividad SET Titulo = ?, Descripcion = ?, Fecha_entrega = ? WHERE Id_actividad = ?";
+    $sqlUpdateActivity = "UPDATE actividad SET Titulo = ?, Descripcion = ?, Fecha_entrega = ?, orden = ? WHERE Id_actividad = ?";
     $stmtUpdateActivity = $conn->prepare($sqlUpdateActivity);
-    $stmtUpdateActivity->bind_param("sssi", $titulo, $descripcion, $fechaEntrega, $idActividad);
+    $stmtUpdateActivity->bind_param("sssii", $titulo, $descripcion, $fechaEntrega, $orden, $idActividad);
     $stmtUpdateActivity->execute();
 
     // Manejo de archivos subidos

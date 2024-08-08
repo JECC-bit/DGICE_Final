@@ -1,14 +1,12 @@
-<?php 
-    session_start(); 
-
-    require 'scripts/db.php'; 
-
-    // Función para verificar si el usuario está autenticado
-    function estaAutenticado() {
-        return isset($_SESSION['rol']) && isset($_SESSION['numero_cuenta']) && isset($_SESSION['id_cuenta']);
+<?php
+    // Verificamos que haya una sesión activa
+    session_start();
+    if (!isset($_SESSION['id_cuenta'])) {
+        header("Location: InicioSesion.php");
+        exit();
     }
 
-    // Verifica si existe el parámetro 'sesion' en la URL y si su valor es 'cerrar'
+    // Verificamos si el usuario quiere cerrar sesión
     if (isset($_GET['cerrar']) && $_GET['cerrar'] === 'yes') {
         // Destruye la sesión
         session_destroy();
@@ -21,77 +19,38 @@
         exit();
     }
 
-    // Proteger la página Principal.php
-    if (!estaAutenticado()) {
-        // Si el usuario no está autenticado, redirigir a la página de inicio de sesión
-        header("Location: InicioSesion.php");
-        exit();
-    }
-
     include 'scripts/db.php';
 
     $codigoBootcamp = $_GET['cod'];
 
     // Obtener el ID del bootcamp usando el código
-    $sqlBootcampId = "SELECT Id_bootcamp, Nombre_bootcamp FROM bootcamp WHERE Codigo = ?";
+    $sqlBootcampId = "SELECT * FROM bootcamp WHERE Codigo = ?";
     $stmtBootcampId = $conn->prepare($sqlBootcampId);
     $stmtBootcampId->bind_param("s", $codigoBootcamp);
     $stmtBootcampId->execute();
     $resultBootcampId = $stmtBootcampId->get_result();
-    $rowBootcampId = $resultBootcampId->fetch_assoc();
-    $idBootcamp = $rowBootcampId['Id_bootcamp'];
+    $rowBootcamp = $resultBootcampId->fetch_assoc();
+    $idBootcamp = $rowBootcamp['Id_bootcamp'];
+    
+    if ($_SESSION['rol'] === 'Usuario'){
+        // Verificamos que el usuario esté inscrito en el bootcamp
+        $sqlVerifyUser = "SELECT * FROM asignacion_cuenta WHERE Id_cuenta = ? AND Id_bootcamp = ?";
+        $stmtVerifyUser = $conn->prepare($sqlVerifyUser);
+        $stmtVerifyUser->bind_param("ii", $_SESSION['id_cuenta'], $idBootcamp);
+        $stmtVerifyUser->execute();
+        $resultVerifyUser = $stmtVerifyUser->get_result();
+        $rowVerifyUser = $resultVerifyUser->fetch_assoc();
+        $stmtVerifyUser->close();
 
-    // Obtener las actividades del bootcamp en orden
-    $sqlActivities = "
-        SELECT a.Id_actividad, a.Titulo, a.Status, a.orden, a.Descripcion, a.Video, a.Fecha_entrega
-        FROM actividad a
-        JOIN asignacion_actividad aa ON a.Id_actividad = aa.Id_actividad
-        WHERE aa.Id_bootcamp = ? AND a.Id_actividad = ?
-        ORDER BY a.orden
-    ";
-    $stmtActivities = $conn->prepare($sqlActivities);
-    $stmtActivities->bind_param("ii", $idBootcamp, $_GET['id']);
-    $stmtActivities->execute();
-    $resultActivities = $stmtActivities->get_result();
-
-    $stmtBootcampId->close();
-    $stmtActivities->close();
-    $conn->close();
-
-    $actividad = $resultActivities->fetch_assoc();
-
-    // Verificamos que el usuario esté dentro de un equipo
-    include 'scripts/db.php';
-
-    if ($_SESSION['rol'] == 'Usuario') {
-        // Extraer el ID del equipo al que pertenece el usuario
-        $sqlVerifyTeam = "SELECT ae.Id_equipo 
-                        FROM asignacion_equipo as ae
-                        JOIN asignacion_cuenta as ac ON ae.Id_cuenta_bootcamp = ac.Id_cuenta_bootcamp
-                        WHERE ac.Id_bootcamp = ? AND ac.Id_cuenta= ?";
-        $stmtVerifyTeam = $conn->prepare($sqlVerifyTeam);
-        $stmtVerifyTeam->bind_param("ii", $idBootcamp, $_SESSION['id_cuenta']);
-        $stmtVerifyTeam->execute();
-        $resultVerifyTeam = $stmtVerifyTeam->get_result();
-        $rowVerifyTeam = $resultVerifyTeam->fetch_assoc();
-        $stmtVerifyTeam->close();
-
-        // En caso de no tener un equipo asignado, redirigir a la página del bootcamp
-        if ($_SESSION['rol'] == 'Usuario' && $rowVerifyTeam == null) {
-            header("Location: bootcamp.php?cod=$codigoBootcamp");
+        // En caso de no estar inscrito retorna a la página principal
+        if (!$rowVerifyUser) {
+            header("Location: Principal.php");
             exit();
         }
     }
 
-    include 'scripts/db.php';
-    // Extraer los materiales de la actividad
-    $sqlMaterial = $conn->prepare("SELECT m.Id_material, m.Material
-                    FROM material m
-                    JOIN asignacion_material am ON m.Id_material = am.Id_material
-                    WHERE am.Id_bootcamp = ? AND am.Id_actividad = ?;");
-    $sqlMaterial->bind_param("ii", $idBootcamp, $actividad['Id_actividad']);
-    $sqlMaterial->execute();
-    $resultMaterial = $sqlMaterial->get_result();
+    //TODO Extraer el material del bootcamp
+    
 ?>
 
 <!DOCTYPE html>
@@ -99,9 +58,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php 
-        echo '<title>Actividad - '.$actividad['orden'].'</title>';
-    ?>
+    <?php echo'<title>'.$rowBootcamp['Nombre_bootcamp'].'</title>' ?>
     <link rel="icon" href="img/UDC_logo.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
@@ -209,53 +166,21 @@
                             <img src="img/UDC.png" alt="">
                         </div>
                         <?php
-                            echo '<h2 class="mb-3">'.$actividad['Titulo'].'</h2><br>';
+                            echo '<h2 class="mb-3">'.$rowBootcamp['Nombre_bootcamp'].'</h2><br>';
                         ?>
                     </div>
-                    <!--? Video de la actividad -->
-                    <?php
-                        if ($actividad['Video'] != null) {
-                            echo '<div class="video-preview col-md-12">
-                                    <iframe src="'.$actividad['Video'].'" frameborder="0"></iframe> 
-                                </div>';
-                        }
-                    ?>
-                    
-                    <div class="container">
-                        <div class="row">
-                            <!--? TEXTO DE INSTRUCCIONES -->
-                            <div class="col-md-8">
-                                <div class="content-left" id="texto">
-                                    <h3>Descripción de la actividad</h3>
-                                    <p><?php echo nl2br($actividad['Descripcion']) ?></p>
-                                </div>
-                            </div>
-                            <!-- ? Fecha y botón -->
-                            <div class="col-md-4">
-                                <div id="entrega" class="shadow rounded mb-5 ms-2">
-                                    <h3>Su trabajo</h3>
-                                    <p id="Fecha"><b>Fecha de entrega:</b> <?php echo $actividad['Fecha_entrega'] ?></p>
-                                    <!--? Boton subir documento -->
-                                    <form action="" method="post" enctype="multipart/form-data">
-                                        <label for="file-upload" class="upload-button">
-                                            <i class="fas fa-file-upload upload-icon"></i> Subir Documento
-                                        </label>
-                                        <input type="file" id="file-upload" name="file-upload" style="display: none;" multiple onchange="previewFiles()"><br>
-                                        <button type="submit" class="submit-button">Subir</button>
-                                    </form>
-                                </div>
-
-                                <!-- ? Material -->
-                                <div class="documento">
-                                    <h3>Material de apoyo</h3>
-                                    <?php
-                                        while ($material = $resultMaterial->fetch_assoc()) {
-                                            echo '<iframe class="file-preview" src="'.$material['Material'].'"></iframe>';
-                                        }
-                                    ?>
-                                </div>
-                            </div>
-                        </div>
+                    <!--? TEXTO DE INSTRUCCIONES -->
+                    <div class="content-left" id="texto">
+                        <h3>Bienvenid@, espera a que se genere tu equipo</h3>
+                        <p><?php echo nl2br($rowBootcamp['Descripcion']) ?></p>
+                    </div>
+                    <!-- ? Material -->
+                    <div class="documento">
+                        <?php
+                            // while ($material = $resultMaterial->fetch_assoc()) {
+                            //     echo '<iframe class="file-preview" src="'.$material['Material'].'"></iframe>';
+                            // }
+                        ?>
                     </div>
                 </div>
             </div>

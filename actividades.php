@@ -1,5 +1,4 @@
 <?php 
-
     // Verifica si existe el parámetro 'sesion' en la URL y si su valor es 'cerrar'
     if (isset($_GET['cerrar']) && $_GET['cerrar'] === 'yes') {
         // Destruye la sesión
@@ -13,9 +12,6 @@
         exit();
     }
 
-?>
-
-<?php
     include 'scripts/db.php';
 
     $codigoBootcamp = $_GET['cod'];
@@ -45,6 +41,35 @@
     $stmtBootcampId->close();
     $stmtActivities->close();
     $conn->close();
+
+    
+    // Verificamos que el usuario esté dentro de un equipo
+    session_start();
+    include 'scripts/db.php';
+
+    if ($_SESSION['rol'] == 'Usuario') {
+        // Extraer el ID del equipo al que pertenece el usuario
+        $sqlVerifyTeam = "SELECT ae.Id_equipo 
+                        FROM asignacion_equipo as ae
+                        JOIN asignacion_cuenta as ac ON ae.Id_cuenta_bootcamp = ac.Id_cuenta_bootcamp
+                        WHERE ac.Id_bootcamp = ? AND ac.Id_cuenta= ?";
+        $stmtVerifyTeam = $conn->prepare($sqlVerifyTeam);
+        $stmtVerifyTeam->bind_param("ii", $idBootcamp, $_SESSION['id_cuenta']);
+        $stmtVerifyTeam->execute();
+        $resultVerifyTeam = $stmtVerifyTeam->get_result();
+        $rowVerifyTeam = $resultVerifyTeam->fetch_assoc();
+        $stmtVerifyTeam->close();
+
+        // En caso de no tener un equipo asignado, redirigir a la página del bootcamp
+        if ($_SESSION['rol'] == 'Usuario' && $rowVerifyTeam == null) {
+            header("Location: bootcamp.php?cod=$codigoBootcamp");
+            exit();
+        }
+    }
+    else{
+        header("Location: actividades_admin.php?cod=$codigoBootcamp");
+        exit();
+    }
 ?>
 
 <!DOCTYPE html>

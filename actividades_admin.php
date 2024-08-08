@@ -13,6 +13,13 @@
         exit();
     }
 
+    // Nos aseguramos que solo los administradores puedan acceder a esta página
+    session_start();
+    if ($_SESSION['rol'] !== 'Administrador') {
+        header("Location: home_bootcamp.html");
+        exit();
+    }
+
 ?>
 
 <?php

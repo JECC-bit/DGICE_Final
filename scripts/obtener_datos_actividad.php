@@ -44,6 +44,20 @@ $resultMaterials = $stmtMaterials->get_result();
             <input type="text" class="form-control" id="nombre" name="nombre" required value="<?php echo $rowActivity['Titulo']; ?>">
         </div>
         <div class="mb-3">
+            <label for="orden" class="form-label">Número de actividad</label>
+            <select class="form-control" id="orden" name="orden" required>
+                <?php 
+                    for($i = 1;  $i <= 20; $i++){ 
+                        if ($i == $rowActivity['orden']) {
+                            echo '<option value="' .$i .'" selected>' .$i. '</option>';
+                        } else {
+                            echo '<option value="' .$i .'" >' .$i. '</option>';
+                        }
+                    } 
+                ?>
+            </select>
+        </div>
+        <div class="mb-3">
             <div class="container-fluid" id="hora-fecha">
                 <div class="row">
                     <div class="col-md-6 col-sm-12">
@@ -60,6 +74,10 @@ $resultMaterials = $stmtMaterials->get_result();
         <div class="mb-3">
             <label for="descripcion" class="form-label">Descripción</label>
             <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required><?php echo $rowActivity['Descripcion']; ?></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="video" class="form-label">Link del video de apoyo</label>
+            <input type="text" class="form-control" id="video" name="video" value="<?php echo $rowActivity['Video']; ?>">
         </div>
         <!-- Agregar el campo para subir archivos aquí -->
         <div class="container">

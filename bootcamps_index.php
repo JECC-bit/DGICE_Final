@@ -1,6 +1,13 @@
 <?php
 include 'scripts/db.php';
 
+// Nos aseguramos que solo los administradores puedan acceder a esta página
+session_start();
+if ($_SESSION['rol'] !== 'Administrador') {
+    header("Location: home_bootcamp.html");
+    exit();
+}
+
 // Consultar los bootcamps
 $sql = "SELECT b.Id_bootcamp, b.Codigo, b.Nombre_bootcamp, b.Descripcion, c.Campus AS Nombre_campus
         FROM bootcamp b
@@ -14,6 +21,7 @@ $result_encargados = $conn->query($sql_encargados);
 // Consultar las dependencias (campus)
 $sql_dependencias = "SELECT Id_campus, Campus FROM campus";
 $result_dependencias = $conn->query($sql_dependencias);
+
 ?>
 <!DOCTYPE html>
 <html lang="es">

@@ -31,6 +31,7 @@ CREATE TABLE `actividad` (
   `Id_actividad` int(11) NOT NULL,
   `Titulo` varchar(100) NOT NULL,
   `Descripcion` text NOT NULL,
+  `Video` text NULL,
   `Status` varchar(25) NOT NULL,
   `Created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `Fecha_publicacion` datetime NOT NULL,

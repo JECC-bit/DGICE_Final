@@ -4,6 +4,12 @@ require 'scripts/db.php';
 
 $cod = $_GET['cod'] ?? null;
 
+// Nos aseguramos que solo los administradores puedan acceder a esta página
+if ($_SESSION['rol'] !== 'Administrador') {
+    header("Location: home_bootcamp.html");
+    exit();
+}
+
 if ($cod) {
     // Obtener el ID del bootcamp usando el código
     $stmt = $pdo->prepare('SELECT Id_bootcamp FROM bootcamp WHERE Codigo = ?');

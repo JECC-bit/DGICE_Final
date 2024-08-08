@@ -2,6 +2,12 @@
 session_start();
 include 'scripts/db.php';
 
+// Nos aseguramos que solo los administradores puedan acceder a esta página
+if ($_SESSION['rol'] !== 'Administrador') {
+    header("Location: home_bootcamp.html");
+    exit();
+}
+
 // Consultar los encargados (administradores)
 $sql_encargados = "SELECT c.Id_cuenta, n.Nombres, n.Apellido_paterno, n.Apellido_materno FROM cuenta c JOIN usuario u ON c.No_cuenta = u.No_cuenta JOIN nombre n ON u.Id_nombre = n.Id_nombre WHERE c.Rol = 'Administrador'";
 $result_encargados = $conn->query($sql_encargados);
@@ -217,14 +223,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fechaFinBootcamp = $_POST["fechaFinBootcamp"];
     $codigo_unico = generarCodigoUnico($pdo);
 
+    // Asignamos el estado del bootcamp según la fecha de inicio y fin
+    $fecha_actual = date("Y-m-d");
+    if ($fecha_actual >= $fechaInicioBootcamp) {
+        $status = "activo";
+    } elseif ($fecha_actual < $fechaInicioBootcamp) {
+        $status = "pendiente";
+    } elseif ($fecha_actual > $fechaFinBootcamp) {
+        $status = "finalizado";
+    }
+
     // Insertar el nuevo bootcamp en la tabla `bootcamp`
-    $sql = "INSERT INTO bootcamp (Codigo, Nombre_bootcamp, Fecha_inicio, Fecha_cierre, Descripcion, Id_campus, Status, Created_at)
-            VALUES (?, ?, ?, ?, ?, ?, 'activo', NOW())";
+    $sql = "INSERT INTO bootcamp (Codigo, Nombre_bootcamp, Fecha_inicio, Fecha_cierre, Descripcion, Id_campus, `Status`, Created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
 
     // Preparar la declaración
     if ($stmt = $conn->prepare($sql)) {
         // Enlazar parámetros
-        $stmt->bind_param("sssssi", $codigo_unico, $nombreBootcamp, $fechaInicioBootcamp, $fechaFinBootcamp, $descripcionBootcamp, $dependenciaBootcamp);
+        $stmt->bind_param("sssssis", $codigo_unico, $nombreBootcamp, $fechaInicioBootcamp, $fechaFinBootcamp, $descripcionBootcamp, $dependenciaBootcamp, $status);
 
         // Ejecutar la declaración
         if ($stmt->execute()) {
@@ -246,6 +262,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         // Cerrar la declaración
         $stmt->close();
+
+        // Guardamos el material subido
+        $sqlMaterial = "INSERT INTO material (Id_bootcamp, Nombre_archivo, Ruta_archivo, Created_at) VALUES (?, ?, ?, NOW())";
     } else {
         echo "Error en la preparación de la declaración: " . $conn->error;
     }

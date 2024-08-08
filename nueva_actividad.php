@@ -1,10 +1,18 @@
 <?php
+// Nos aseguramos que solo los administradores puedan acceder a esta página
+session_start();
+if ($_SESSION['rol'] !== 'Administrador') {
+    header("Location: home_bootcamp.html");
+    exit();
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     include 'scripts/db.php';
 
     // Obtener los datos del formulario
     $titulo = $_POST['nombre'];
     $descripcion = $_POST['descripcion'];
+    $video = $_POST['video'];
     $fechaPublicacion = $_POST['fechaPublicacion'];
     $fechaEntrega = $_POST['fechaEntrega'] . ' ' . $_POST['horaEntrega'];
     $orden = $_POST['orden'];
@@ -31,12 +39,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $activityCount = $rowCount['count'];
 
         // Determinar el estado de la nueva actividad
-        $status = ($activityCount == 0) ? 'pending' : 'blocked';
+        // $status = ($activityCount == 0) ? 'pending' : 'blocked';
+
+        // Establecemos el estado de la actividad dependiendo de la fecha de publicación y la fecha de entrega
+        $fechaActual = date('Y-m-d');
+        if($fechaPublicacion <= $fechaActual){
+            $status = 'pending';
+        } elseif($fechaPublicacion > $fechaActual){
+            $status = 'blocked';
+        }
 
         // Insertar la nueva actividad en la tabla `actividad`
-        $sqlInsertActivity = "INSERT INTO actividad (Titulo, Descripcion, Status, Created_at, Fecha_publicacion, Fecha_entrega, orden) VALUES (?, ?, ?, NOW(), ?, ?, ?)";
+        $sqlInsertActivity = "INSERT INTO actividad (Titulo, Descripcion, Video, `Status`, Created_at, Fecha_publicacion, Fecha_entrega, orden) VALUES (?, ?, ?, ?, NOW(), ?, ?, ?)";
         $stmtInsertActivity = $conn->prepare($sqlInsertActivity);
-        $stmtInsertActivity->bind_param("sssssi", $titulo, $descripcion, $status, $fechaPublicacion, $fechaEntrega, $orden);
+        $stmtInsertActivity->bind_param("ssssssi", $titulo, $descripcion, $video, $status, $fechaPublicacion, $fechaEntrega, $orden);
         $stmtInsertActivity->execute();
 
         $idActividad = $conn->insert_id;
@@ -86,9 +102,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -131,11 +144,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <span>Regresar a la vista bootcamps</span>
                     </a>
                 </li>
-                <li class="nav-item active mb-2 shadow rounded">
+                <li class="nav-item mb-2">
                     <!--! Cambiar el active en la clase para indicar en la acción en la que está actualmente -->
                     <!--! El aria-current es para indicar que se encuentra en la página actual, también cambiarla según sea el caso -->
-                    <a class="nav-link active mb-2 ms-4 mt-2" aria-current="page" href="actividades_admin.php?cod=<?php echo $_GET['cod'] ?>">
-                        <i class="bi bi-bullseye me-2"></i>
+                    <a class="nav-link mb-2 ms-2 mt-2" href="actividades_admin.php?cod=<?php echo $_GET['cod'] ?>">
+                        <i class="bi bi-bookmark-check me-2"></i>
                         <span>Actividades asignadas</span>
                     </a>
                 </li>
@@ -177,11 +190,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <span>Regresar a la vista bootcamps</span>
                         </a>
                     </li>
-                    <li class="nav-item active shadow rounded">
+                    <li class="nav-item">
                         <!--! Cambiar el active en la clase para indicar en la acción en la que está actualmente -->
                         <!--! El aria-current es para indicar que se encuentra en la página actual, también cambiarla según sea el caso -->
-                        <a class="nav-link active" aria-current="page" href="actividades_admin.php?cod=<?php echo $_GET['cod'] ?>">
-                            <i class="bi bi-bullseye me-2"></i>
+                        <a class="nav-link" href="actividades_admin.php?cod=<?php echo $_GET['cod'] ?>">
+                            <i class="bi bi-bookmark-check me-2"></i>
                             <span>Actividades asignadas</span>
                         </a>
                     </li>
@@ -260,6 +273,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <label for="descripcion" class="form-label">Descripción</label>
                                     <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
                                 </div>
+                                <div class="mb-3">
+                                    <label for="video" class="form-label">Link del video de apoyo</label>
+                                    <input type="text" class="form-control" id="video" name="video">
+                                </div>
                                 <div class="container">
                                     <div class="row">
                                         <div class="col-lg-6 col-md-12">
@@ -294,10 +311,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary">Crear Actividad</button>
+                            <button type="submit" class="btn btn-primary mt-4">Crear Actividad</button>
                         </form>
                     </div>
-
                 </div>
             </div>
         </div>
