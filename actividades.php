@@ -62,7 +62,7 @@
 
         // En caso de no tener un equipo asignado, redirigir a la página del bootcamp
         if ($_SESSION['rol'] == 'Usuario' && $rowVerifyTeam == null) {
-            header("Location: bootcamp.php?cod=$codigoBootcamp");
+            header("Location: home_bootcamp.html");
             exit();
         }
     }

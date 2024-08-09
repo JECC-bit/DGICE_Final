@@ -128,11 +128,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <span>Regresar a la vista bootcamps</span>
                     </a>
                 </li>
-                <li class="nav-item active mb-2 shadow rounded">
+                <li class="nav-item mb-2">
                     <!--! Cambiar el active en la clase para indicar en la acción en la que está actualmente -->
                     <!--! El aria-current es para indicar que se encuentra en la página actual, también cambiarla según sea el caso -->
-                    <a class="nav-link active mb-2 ms-4 mt-2" aria-current="page" href="actividades_admin.php?cod=<?php echo $_GET['cod'] ?>">
-                        <i class="bi bi-bullseye me-2"></i>
+                    <a class="nav-link mb-2 ms-2 mt-2" href="actividades_admin.php?cod=<?php echo $_GET['cod'] ?>">
+                        <i class="bi bi-bookmark-check me-2"></i>
                         <span>Actividades asignadas</span>
                     </a>
                 </li>
@@ -174,11 +174,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <span>Regresar a la vista bootcamps</span>
                         </a>
                     </li>
-                    <li class="nav-item active shadow rounded">
+                    <li class="nav-item">
                         <!--! Cambiar el active en la clase para indicar en la acción en la que está actualmente -->
                         <!--! El aria-current es para indicar que se encuentra en la página actual, también cambiarla según sea el caso -->
-                        <a class="nav-link active" aria-current="page" href="actividades_admin.php?cod=<?php echo $_GET['cod'] ?>">
-                            <i class="bi bi-bullseye me-2"></i>
+                        <a class="nav-link" href="actividades_admin.php?cod=<?php echo $_GET['cod'] ?>">
+                            <i class="bi bi-bookmark-check me-2"></i>
                             <span>Actividades asignadas</span>
                         </a>
                     </li>
@@ -228,6 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="mb-3">
                                     <label for="nombre" class="form-label">Selecciona la actividad</label>
                                     <select name="actividad" id="actividad" class="form-control" required onchange="cargarDatosActividad(this.value)">
+                                        <option selected disabled><b>Selecciona una actividad</b></option>
                                         <?php while ($rowActivity = $resultActivities->fetch_assoc()): ?>
                                             <option value="<?php echo $rowActivity['Id_actividad']; ?>"><?php echo $rowActivity['Titulo']; ?></option>
                                         <?php endwhile; ?>
@@ -246,6 +247,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             xhr.onload = function() {
                                 if (this.status == 200) {
                                     document.getElementById('form-datos-actividad').innerHTML = this.responseText;
+                                    // Cargar el script para manejar los archivos
+                                    const scriptTag = document.createElement('script');
+                                    scriptTag.src = "js/files.js";
+                                    document.head.appendChild(scriptTag);
                                 }
                             };
                             xhr.send();
